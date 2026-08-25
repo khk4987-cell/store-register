@@ -422,6 +422,24 @@ const SUPPLEMENT_DOC_LIST = [
   { key: 'supp_16', label: '표준서식 전체' }
 ];
 
+// [보완요청용] 최초 가맹 접수 때 요구했던 서류 종류들. 업종/간판유무 등 조건에 따라
+// 실제로는 이 중 일부만 해당 가맹점에 요청됐었지만, 시트에는 그 조건이 남아있지 않아
+// 어떤 걸 다시 받아야 하는지는 관리자가 직접 판단해서 체크하도록 전체 종류를 나열해둔다.
+const ORIGINAL_REQUEST_DOC_LIST = [
+  { key: 'bizLicense', label: '사업자등록증' },
+  { key: 'idCard', label: '대표자 신분증 (개인사업자)' },
+  { key: 'bankbook', label: '통장사본' },
+  { key: 'interiorPhoto', label: '매장 내부 사진' },
+  { key: 'insideOutsidePhoto', label: '내부에서 외부가 보이는 사진' },
+  { key: 'exteriorPhoto', label: '외부 사진 (간판 포함)' },
+  { key: 'addressPlate', label: '도로명주소판 사진' },
+  { key: 'addressBuildingPhoto', label: '도로명주소 포함 건물 사진' },
+  { key: 'corpSeal', label: '법인인감증명서 (법인)' },
+  { key: 'corpReg', label: '법인등기부등본 (법인)' },
+  { key: 'shareholder', label: '주주명부 (법인)' },
+  { key: 'permitLicense', label: '업종별 영업신고증/등록증 (식품·공중위생·학원 등)' }
+];
+
 const BUSINESS_TYPES = [
   { id: 'general', name: '일반 도소매/서비스업 (일반 사업자)' },
   { id: 'food', name: '음식점 / 카페 / 유흥주점 (식품위생업)' },
@@ -484,7 +502,8 @@ const urlParams = parseQueryParams();
 
 function getRequiredDocs(businessType, bizType, hasSign){
   if (state.isSupplementMode && state.supplementDocKeys.length > 0) {
-    return SUPPLEMENT_DOC_LIST.filter(d => state.supplementDocKeys.includes(d.key)).map(d => ({
+    const allSupplementSelectable = [...ORIGINAL_REQUEST_DOC_LIST, ...SUPPLEMENT_DOC_LIST];
+    return allSupplementSelectable.filter(d => state.supplementDocKeys.includes(d.key)).map(d => ({
       key: d.key,
       label: d.label,
       accept: 'image/*,.pdf',
@@ -1135,7 +1154,18 @@ function renderSupplementModal() {
     <div class="modal-box" onclick="event.stopPropagation()">
       <div class="modal-title">보완 서류 선택 - ${escapeHtml(m ? m.storeName : '')}</div>
       <div class="modal-sub">고객에게 다시 요구할 보완 서류를 선택하세요. 체크한 서류만 업로드할 수 있는 전용 폼 링크가 생성됩니다.</div>
-      
+
+      <div class="opt-group-label" style="margin-top:6px;">📎 접수 시 요청서류 (해당하는 항목만 체크)</div>
+      <div class="modal-list">
+        ${ORIGINAL_REQUEST_DOC_LIST.map(item => `
+          <label class="modal-item">
+            <input type="checkbox" value="${item.key}" ${state.selectedModalDocs.includes(item.key) ? 'checked' : ''} onchange="App.toggleModalDoc('${item.key}')">
+            <span>${item.label}</span>
+          </label>
+        `).join('')}
+      </div>
+
+      <div class="opt-group-label" style="margin-top:18px;">📋 특수 서류 (위임장·동의서 등)</div>
       <div class="modal-list">
         ${SUPPLEMENT_DOC_LIST.map(item => `
           <label class="modal-item">
