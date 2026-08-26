@@ -368,19 +368,33 @@ body{
   }
 }
 @media print{
-  @page { size: A4 portrait; margin: 10mm; }
-  body{background:white; color:#000;}
-  .no-print,.topbar,.toast{display:none !important;}
-  #app{max-width:none;padding:0;margin:0;}
-  .contract-page{
-    border:none !important;box-shadow:none !important;padding:0 !important;margin:0 !important;
-    page-break-after:always !important; break-after:page !important;
+  @page { size: A4 portrait; margin: 7mm; }
+  body{ background:white; color:#000; }
+  .no-print,.topbar,.toast{ display:none !important; }
+  #app{ max-width:none; padding:0; margin:0; }
+
+  /* 인쇄 시 계약서 글자/여백을 줄여 분량을 줄임 (제품판매계약서가 한 장에 들어가도록 보정) */
+  .contract-page, .cms-page {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 8px !important;
+    margin: 0 !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    -webkit-print-color-adjust: exact;
   }
-  .cms-page{
-    border:none !important;box-shadow:none !important;padding:0 !important;margin:0 !important;
-    page-break-after:always !important; break-after:page !important;
-  }
-  .editable-penalty{border:none !important;background:transparent !important;padding:0 !important;}
+
+  /* CMS 뒤에 강제로 빈 페이지가 생기지 않도록 설정 */
+  .cms-page { page-break-after: auto !important; break-after: auto !important; }
+
+  /* contract 페이지도 강제로 다음 페이지를 만들지 않음 (내용이 길면 흘러넘치지만 우선 강제 분할은 제거) */
+  .contract-page { page-break-after: auto !important; break-after: auto !important; }
+
+  .contract-top-title { font-size: 18px !important; margin-bottom: 8px !important; }
+
+  .editable-penalty{ border:none !important; background:transparent !important; padding:0 !important; }
 }
 </style>
 </head>
